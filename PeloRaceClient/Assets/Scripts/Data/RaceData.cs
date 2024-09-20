@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace PeloRace.Scripts.Data
+namespace Data
 {
     [CreateAssetMenu(fileName = "NewRaceData", menuName = "PeloRace/RaceData", order = 1)]
     public class RaceData : ScriptableObject

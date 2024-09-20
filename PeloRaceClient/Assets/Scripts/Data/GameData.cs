@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace PeloRace.Scripts.Data
+namespace Data
 {
     [CreateAssetMenu(fileName = "NewGameData", menuName = "PeloRace/GameData", order = 1)]
     public class GameData  : ScriptableObject
@@ -12,14 +10,39 @@ namespace PeloRace.Scripts.Data
         #region Properties
 
         [SerializeField] private List<RaceData> _raceData;
-        private Dictionary<string, RaceData> _dataDict = new Dictionary<string, RaceData>();
+        private Dictionary<string, RaceData> _dataDict = new();
 
         #endregion
+
+#if UNITY_EDITOR
+
+        public void Setup(List<RaceData> newRaces)
+        {
+            _raceData = newRaces;
+            LoadData();
+        }
+#endif
         
+        // OnEnable runs at instantiation editor & runtime
         private void OnEnable()
         {
+            if (_raceData == null)
+            {
+                // Initialize list and move on to allow for instantiation from code,
+                _raceData = new();
+                return;
+                // The setup below is intended for already instantiated initialization at runtime;
+            }
+
+            LoadData();
+        }
+
+        /// <summary>
+        /// Loads data into quick access dictionary
+        /// </summary>
+        private void LoadData()
+        {
             // Load race data at start of run time 
-            // OnEnable runs at instantiation editor & runtime
             foreach (RaceData raceData in _raceData)
             {
                 _dataDict.Add(raceData.name, raceData);
