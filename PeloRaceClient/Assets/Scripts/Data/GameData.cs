@@ -21,6 +21,7 @@ namespace Data
             _raceData = newRaces;
             LoadData();
         }
+        
 #endif
         
         // OnEnable runs at instantiation editor & runtime
