@@ -1,25 +1,26 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 namespace Data
 {
-    [CreateAssetMenu(fileName = "NewGameData", menuName = "PeloRace/GameData", order = 1)]
-    public class GameData  : ScriptableObject
+    [CreateAssetMenu(fileName = "NewGameConfig", menuName = "PeloRace/GameConfig", order = 1)]
+    public class GameConfig  : ScriptableObject
     {
         #region Properties
 
-        [SerializeField] private List<RaceData> _raceData;
-        private Dictionary<string, RaceData> _dataDict = new();
+        [SerializeField] private List<RaceConfig> _raceConfig;
+        private readonly Dictionary<string, RaceConfig> _dataDict = new();
 
         #endregion
 
 #if UNITY_EDITOR
 
-        public void Setup(List<RaceData> newRaces)
+        public void Setup(List<RaceConfig> newRaces)
         {
-            _raceData = newRaces;
-            LoadData();
+            _raceConfig = newRaces;
+            LoadConfig();
         }
         
 #endif
@@ -27,26 +28,26 @@ namespace Data
         // OnEnable runs at instantiation editor & runtime
         private void OnEnable()
         {
-            if (_raceData == null)
+            if (_raceConfig == null)
             {
                 // Initialize list and move on to allow for instantiation from code,
-                _raceData = new();
+                _raceConfig = new();
                 return;
                 // The setup below is intended for already instantiated initialization at runtime;
             }
 
-            LoadData();
+            LoadConfig();
         }
 
         /// <summary>
         /// Loads data into quick access dictionary
         /// </summary>
-        private void LoadData()
+        private void LoadConfig()
         {
             // Load race data at start of run time 
-            foreach (RaceData raceData in _raceData)
+            foreach (RaceConfig raceConfig in _raceConfig)
             {
-                _dataDict.Add(raceData.name, raceData);
+                _dataDict.Add(raceConfig.name, raceConfig);
             }
         }
 
@@ -56,7 +57,7 @@ namespace Data
         /// <returns></returns>
         public (string, string)[] GetRaceDisplayData()
         {
-            return _raceData.ConvertAll(data => (data.name, data.DisplayName)).ToArray();
+            return _raceConfig.ConvertAll(data => (data.name, data.DisplayName)).ToArray();
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace Data
         /// </summary>
         /// <param name="raceKey">file name of race file</param>
         /// <returns></returns>
-        public RaceData GetRaceData(string raceKey)
+        public RaceConfig GetRaceConfig(string raceKey)
         {
             Assert.IsTrue(_dataDict.ContainsKey(raceKey));
             return _dataDict[raceKey];

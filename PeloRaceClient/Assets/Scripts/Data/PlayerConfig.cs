@@ -2,8 +2,8 @@
 
 namespace Data
 {
-    [CreateAssetMenu(fileName = "NewPlayerControlData", menuName = "PeloRace/PlayerControlData", order = 0)]
-    public class RowerData : ScriptableObject
+    [CreateAssetMenu(fileName = "NewPlayerConfig", menuName = "PeloRace/PlayerConfig", order = 0)]
+    public class PlayerConfig : ScriptableObject
     {
         public float MaxSpeed;
         public float MinSpeed;

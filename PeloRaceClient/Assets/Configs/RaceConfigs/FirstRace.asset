@@ -15,5 +15,6 @@ MonoBehaviour:
   DisplayName: First Race
   RaceDistance: 100
   ScoreDistanceThresh: 5
-  ScorePerTime: 1
-  ScoreTimeDenominator: 1
+  ScorePerSecond: 10
+  ControlledPlayer: {fileID: 11400000, guid: bbd1cd15cb5cc84449a8ae556800c95b, type: 2}
+  BotPlayer: {fileID: 11400000, guid: bbd1cd15cb5cc84449a8ae556800c95b, type: 2}

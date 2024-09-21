@@ -3,12 +3,14 @@
 namespace Data
 {
     [CreateAssetMenu(fileName = "NewRaceData", menuName = "PeloRace/RaceData", order = 1)]
-    public class RaceData : ScriptableObject
+    public class RaceConfig : ScriptableObject
     {
         public string DisplayName;
         public float RaceDistance;
         public float ScoreDistanceThresh;
-        public float ScorePerTime;
-        public float ScoreTimeDenominator;
+        public float ScorePerSecond;
+
+        public PlayerConfig ControlledPlayer;
+        public PlayerConfig BotPlayer;
     }
 }

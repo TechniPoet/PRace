@@ -7,8 +7,8 @@ namespace Tests
 {
     public class SODataTester
     {
-        private GameData _gameData;
-        private RaceData _raceData1;
+        private GameConfig m_GameConfig;
+        private RaceConfig _raceData1;
         //private RaceData _raceData2;
 
         private const string FileNamePrefix = "File_";
@@ -17,27 +17,27 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            _raceData1 = ScriptableObject.CreateInstance<RaceData>();
+            _raceData1 = ScriptableObject.CreateInstance<RaceConfig>();
             //_raceData2 = ScriptableObject.CreateInstance<RaceData>();
-            _gameData = ScriptableObject.CreateInstance<GameData>();
+            m_GameConfig = ScriptableObject.CreateInstance<GameConfig>();
 
             _raceData1.name = $"{FileNamePrefix}{Race1DisplayName}";
             _raceData1.RaceDistance = 1;
             _raceData1.DisplayName = Race1DisplayName;
-            _gameData.Setup(new List<RaceData>() {_raceData1});
+            m_GameConfig.Setup(new List<RaceConfig>() {_raceData1});
         }
 
         [TearDown]
         public void TearDown()
         {
             Object.DestroyImmediate(_raceData1);
-            Object.DestroyImmediate(_gameData);
+            Object.DestroyImmediate(m_GameConfig);
         }
 
         [Test]
         public void GetRaceDisplayDataTest()
         {
-            var displayData = _gameData.GetRaceDisplayData();
+            var displayData = m_GameConfig.GetRaceDisplayData();
             Assert.IsTrue(displayData.Length == 1);
             Assert.IsTrue(displayData[0].Item1 == $"{FileNamePrefix}{Race1DisplayName}");
             Assert.IsTrue(displayData[0].Item2 == Race1DisplayName);
