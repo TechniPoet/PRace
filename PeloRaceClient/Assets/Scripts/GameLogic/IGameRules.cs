@@ -23,7 +23,7 @@ namespace GameLogic
         public void AdjustRowerTargetSpeed(RaceConfig config, GameRunner.GameState state, GameRunner.RowerId id, bool up);
         public void SetNewTargetSpeed(RaceConfig config, GameRunner.GameState state);
 
-        public void AdjustRowerSpeeds(RaceConfig config, GameRunner.GameState state);
+        public void AdjustRowerSpeeds(GameRunner.GameState state);
 
     }
 }

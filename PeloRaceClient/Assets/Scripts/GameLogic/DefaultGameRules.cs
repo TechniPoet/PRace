@@ -52,8 +52,8 @@ namespace GameLogic
             state.RaceTimeElapsed += deltaTime;
 
             SetNewTargetSpeed(config, state);
-            AdjustRowerSpeeds(config, state);
-            AdjustRowerPositions(config, state, deltaTime);
+            AdjustRowerSpeeds(state);
+            AdjustRowerPositions(state, deltaTime);
             AdjustScores(config, state, deltaTime);
             
             return !IsEndConditionMet(config, state);
@@ -75,7 +75,7 @@ namespace GameLogic
             }
         }
 
-        public void AdjustRowerSpeeds(RaceConfig config, GameRunner.GameState state)
+        public void AdjustRowerSpeeds(GameRunner.GameState state)
         {
             foreach (var rower in state.RowerDatas)
             {
@@ -85,7 +85,7 @@ namespace GameLogic
             }
         }
         
-        public void AdjustRowerPositions(RaceConfig config, GameRunner.GameState state, float deltaTime)
+        public void AdjustRowerPositions(GameRunner.GameState state, float deltaTime)
         {
             foreach (var rower in state.RowerDatas)
             {
