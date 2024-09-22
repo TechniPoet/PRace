@@ -25,7 +25,7 @@ namespace GameLogic
         /// <returns></returns>
         public bool IsEndConditionMet(RaceConfig config, GameRunner.GameState state)
         {
-            if (state.RaceEnded || state.RowerDatas.Any(rowerEntry => rowerEntry.Value.SimPosition > config.RaceDistance))
+            if (state.RaceEnded || state.RowerDatas.All(rowerEntry =>  FinishedRace(config, rowerEntry.Value)))
             {
                 state.RaceEnded = true;
             }
@@ -59,11 +59,16 @@ namespace GameLogic
             return !IsEndConditionMet(config, state);
         }
 
+        public bool FinishedRace(RaceConfig config, GameRunner.RowerData rower)
+        {
+            return rower.SimPosition > config.RaceDistance;
+        } 
+
         public void AdjustScores(RaceConfig config, GameRunner.GameState state, float deltaTime)
         {
             foreach (var rower in state.RowerDatas)
             {
-                if (IsInScoreDistance(config, state, rower.Value))
+                if (IsInScoreDistance(config, state, rower.Value) && !FinishedRace(config, rower.Value))
                 {
                     rower.Value.ScoreTime += deltaTime;
                 }
@@ -75,7 +80,8 @@ namespace GameLogic
             foreach (var rower in state.RowerDatas)
             {
                 if (Mathf.Approximately(rower.Value.Speed, rower.Value.TargetSpeed)) continue;
-                rower.Value.Speed = rower.Value.LerpToSpeedInterval * (rower.Value.Speed > rower.Value.TargetSpeed ? -1 : 1);
+                rower.Value.Speed += rower.Value.LerpToSpeedInterval * 
+                                    (rower.Value.Speed > rower.Value.TargetSpeed ? -1 : 1);
             }
         }
         

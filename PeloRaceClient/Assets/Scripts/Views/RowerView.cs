@@ -22,12 +22,12 @@ namespace GameLogic
             _startPosition = transform.position;
             _service.Join(_id, _startPosition);
             _service.StateUpdated += ServiceStateUpdated;
+            ServiceStateUpdated();
         }
 
         private void ServiceStateUpdated()
         {
             transform.position = _service.GetPosition(_id);
-            Debug.Log($"position updated: {transform.position}");
         }
 
         private void OnDestroy()

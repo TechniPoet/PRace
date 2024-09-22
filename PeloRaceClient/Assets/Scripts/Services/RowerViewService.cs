@@ -68,7 +68,6 @@ namespace Services
         /// <param name="startPosition"></param>
         public void Join(GameRunner.RowerId id, Vector3 startPosition)
         {
-            Debug.Log($"Join {id} : {startPosition}");
             _rowerData.Add(id,
                 new RowerInstanceData() { StartPosition = startPosition, CurrentPosition = startPosition });
         }
