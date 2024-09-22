@@ -19,6 +19,7 @@ namespace GameLogic
                 yield return null;
             }
             _service = RowerViewService.Instance;
+            _startPosition = transform.position;
             _service.Join(_id, _startPosition);
             _service.StateUpdated += ServiceStateUpdated;
         }
@@ -26,6 +27,7 @@ namespace GameLogic
         private void ServiceStateUpdated()
         {
             transform.position = _service.GetPosition(_id);
+            Debug.Log($"position updated: {transform.position}");
         }
 
         private void OnDestroy()

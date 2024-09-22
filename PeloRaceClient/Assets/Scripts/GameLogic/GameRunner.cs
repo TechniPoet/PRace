@@ -26,6 +26,7 @@ namespace GameLogic
         /// <summary>
         /// Container class that holds game state
         /// </summary>
+        [Serializable]
         public class GameState
         {
             public bool RaceEnded;
@@ -43,6 +44,7 @@ namespace GameLogic
             };
         }
 
+        [Serializable]
         public class RowerData
         {
             public float SimPosition;
@@ -50,6 +52,13 @@ namespace GameLogic
             public float TargetSpeed;
             public float LerpToSpeedInterval;
             public float ScoreTime;
+
+            public void Setup(PlayerConfig config)
+            {
+                Speed = config.StartSpeed;
+                TargetSpeed = Speed;
+                LerpToSpeedInterval = config.LerpToSpeedInterval;
+            }
         }
 
 
@@ -75,8 +84,8 @@ namespace GameLogic
         private RowerViewService _viewService;
         private InputService _inputService;
         private IGameRules _rules;
-        
-        public GameState CurrentState { get; set; }
+
+        public GameState CurrentState;
 
         #endregion
         
@@ -116,10 +125,8 @@ namespace GameLogic
         {
             _rules = new DefaultGameRules();
             CurrentState = new();
-            CurrentState.RowerDatas[RowerId.First].Speed = _currentRaceConfig.ControlledPlayer.StartSpeed;
-            CurrentState.RowerDatas[RowerId.First].LerpToSpeedInterval = _currentRaceConfig.ControlledPlayer.LerpToSpeedInterval;
-            CurrentState.RowerDatas[RowerId.Second].Speed = _currentRaceConfig.BotPlayer.StartSpeed;
-            CurrentState.RowerDatas[RowerId.Second].LerpToSpeedInterval = _currentRaceConfig.BotPlayer.LerpToSpeedInterval;
+            CurrentState.RowerDatas[RowerId.First].Setup(_currentRaceConfig.ControlledPlayer);
+            CurrentState.RowerDatas[RowerId.Second].Setup(_currentRaceConfig.BotPlayer);
             _gameTickRoutine = StartCoroutine(RunGameTicks());
         }
 
@@ -130,12 +137,13 @@ namespace GameLogic
 
         public void AdjustRowerSpeed(RowerId id, bool up)
         {
-            if (CurrentState is not { RaceEnded: true }) return;
+            if (CurrentState is { RaceEnded: true }) return;
             _rules.AdjustRowerTargetSpeed(_currentRaceConfig, CurrentState, id, up);
         }
 
         private IEnumerator RunGameTicks()
         {
+            yield return new WaitForSeconds(2f);
             do
             {
                 // Not worrying about bot ai atm.
@@ -151,6 +159,7 @@ namespace GameLogic
             if (arg0.name != "Race") return;
             
             LoadRaceData();
+            StartGame();
         }
 
         public void SetRace(string raceKey)

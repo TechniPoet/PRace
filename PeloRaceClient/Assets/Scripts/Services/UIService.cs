@@ -1,16 +1,41 @@
+using System.Collections.Generic;
+using GameLogic;
+
 namespace Services
 {
-    public class ScoreService
+    public class UIService
     {
-        public static InputService Instance => _instance;
-        private static InputService _instance;
+        public static UIService Instance => _instance;
+        private static UIService _instance;
+        public Dictionary<GameRunner.RowerId, float> RowerScores = new();
+        public float RaceTime;
+        public float PlayerScore; 
+        
         private GameRunner _gameRunner;
         
-        public InputService(GameRunner runner)
+        public UIService(GameRunner runner)
         {
             _instance = this;
             _gameRunner = runner;
+            _gameRunner.StateUpdated += GameStateUpdated;
+            GameStateUpdated();
         }
+        
+        ~UIService()
+        {
+            
+            if (_gameRunner != null) _gameRunner.StateUpdated -= GameStateUpdated;
+            _instance = null;
+            _gameRunner = null;
+        }
+        
+
+        private void GameStateUpdated()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        
 
         public void AdjustRowerSpeed(GameRunner.RowerId id, bool up)
         {

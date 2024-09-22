@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 296ecd3072dc4707a168377a2f2121fa, type: 3}
-  m_Name: DefaultPlayerData
+  m_Name: DefaultPlayerConfig
   m_EditorClassIdentifier: 
-  MaxSpeed: 5
+  MaxSpeed: 15
   MinSpeed: 1
-  ChangeInterval: 0.2
+  ChangeInterval: 0.1
+  LerpToSpeedInterval: 0.5
   StartSpeed: 2

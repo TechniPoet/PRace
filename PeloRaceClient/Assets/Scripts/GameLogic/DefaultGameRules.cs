@@ -53,7 +53,7 @@ namespace GameLogic
 
             SetNewTargetSpeed(config, state);
             AdjustRowerSpeeds(config, state);
-
+            AdjustRowerPositions(config, state, deltaTime);
             AdjustScores(config, state, deltaTime);
             
             return !IsEndConditionMet(config, state);
@@ -76,6 +76,14 @@ namespace GameLogic
             {
                 if (Mathf.Approximately(rower.Value.Speed, rower.Value.TargetSpeed)) continue;
                 rower.Value.Speed = rower.Value.LerpToSpeedInterval * (rower.Value.Speed > rower.Value.TargetSpeed ? -1 : 1);
+            }
+        }
+        
+        public void AdjustRowerPositions(RaceConfig config, GameRunner.GameState state, float deltaTime)
+        {
+            foreach (var rower in state.RowerDatas)
+            {
+                rower.Value.SimPosition += deltaTime * rower.Value.Speed;
             }
         }
 

@@ -35,7 +35,7 @@ namespace Data
                 return;
                 // The setup below is intended for already instantiated initialization at runtime;
             }
-
+            Debug.Log("LoadingConfig");
             LoadConfig();
         }
 
@@ -67,6 +67,7 @@ namespace Data
         /// <returns></returns>
         public RaceConfig GetRaceConfig(string raceKey)
         {
+            if (_dataDict.Count == 0) LoadConfig();
             Assert.IsTrue(_dataDict.ContainsKey(raceKey));
             return _dataDict[raceKey];
         }
