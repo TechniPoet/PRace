@@ -8,6 +8,7 @@ namespace Data
         public float MaxSpeed;
         public float MinSpeed;
         public float ChangeInterval;
+        public float LerpToSpeedInterval;
         public float StartSpeed;
     }
 }

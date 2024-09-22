@@ -15,17 +15,46 @@ namespace GameLogic
     public class GameRunner : MonoBehaviour
     {
 #region Static
-
         // I don't love singletons usually and usually opt for a service locator pattern,
         // but I'm using this for the sake of expediency
         private static GameRunner _instance;
+        public static GameRunner Instance => _instance;
+#endregion
+
+#region Containers
+
+        /// <summary>
+        /// Container class that holds game state
+        /// </summary>
+        public class GameState
+        {
+            public bool RaceEnded;
+            public float RaceTimeElapsed;
+
+            public float LastTargetSpeedChange;
+
+            public float TargetSpeed;
+            // Score time is time in score zone. For multiplayer, we'd want to incorporate this in a per rower data
+            
+            public Dictionary<RowerId, RowerData> RowerDatas = new()
+            {
+                {RowerId.First, new RowerData()},
+                {RowerId.Second, new RowerData()},
+            };
+        }
+
+        public class RowerData
+        {
+            public float SimPosition;
+            public float Speed;
+            public float TargetSpeed;
+            public float LerpToSpeedInterval;
+            public float ScoreTime;
+        }
+
 
 #endregion
 
-#region Events
-        public event Action StateUpdated = () => { };
-
-#endregion
         public enum RowerId
         {
             First = 0,
@@ -35,20 +64,25 @@ namespace GameLogic
 
 #region Properties
 
-        [SerializeField] private GameData _gameData;
+        [SerializeField] private GameConfig gameConfig;
         [SerializeField] private string _currentRaceKey;
-        [SerializeField] private RaceData _currentRaceData;
-
-        private readonly Dictionary<RowerId, float> _rowerPositions = new();
-        public Dictionary<RowerId, float> RowerPositions => _rowerPositions;
-
+        private RaceConfig _currentRaceConfig;
+        
         private Coroutine _gameTickRoutine;
 
         // Service instance holding here is for cleanup but moving forward,
         // I would not want GameRunner to hold the service references.
         private RowerViewService _viewService;
+        private InputService _inputService;
+        private IGameRules _rules;
         
+        public GameState CurrentState { get; set; }
 
+        #endregion
+        
+        
+        #region Events
+        public event Action StateUpdated = () => { };
         #endregion
 
 #region Setup Teardown
@@ -63,20 +97,29 @@ namespace GameLogic
 
             _instance = this;
             DontDestroyOnLoad(this);
-            SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
+            SceneManager.sceneLoaded += SceneManagerOnSceneLoaded;
             _viewService = new RowerViewService(this);
+            _inputService = new InputService(this);
         }
 
         private void OnDestroy()
         {
-            SceneManager.sceneLoaded -= SceneManagerOnsceneLoaded;
+            _viewService = null;
+            _inputService = null;
+            SceneManager.sceneLoaded -= SceneManagerOnSceneLoaded;
         }
 
-        #endregion
+#endregion
         
 
         public void StartGame()
         {
+            _rules = new DefaultGameRules();
+            CurrentState = new();
+            CurrentState.RowerDatas[RowerId.First].Speed = _currentRaceConfig.ControlledPlayer.StartSpeed;
+            CurrentState.RowerDatas[RowerId.First].LerpToSpeedInterval = _currentRaceConfig.ControlledPlayer.LerpToSpeedInterval;
+            CurrentState.RowerDatas[RowerId.Second].Speed = _currentRaceConfig.BotPlayer.StartSpeed;
+            CurrentState.RowerDatas[RowerId.Second].LerpToSpeedInterval = _currentRaceConfig.BotPlayer.LerpToSpeedInterval;
             _gameTickRoutine = StartCoroutine(RunGameTicks());
         }
 
@@ -85,14 +128,28 @@ namespace GameLogic
             if (_gameTickRoutine != null) StopCoroutine(_gameTickRoutine);
         }
 
-        private IEnumerator RunGameTicks()
+        public void AdjustRowerSpeed(RowerId id, bool up)
         {
-            yield return null;
+            if (CurrentState is not { RaceEnded: true }) return;
+            _rules.AdjustRowerTargetSpeed(_currentRaceConfig, CurrentState, id, up);
         }
 
-        private void SceneManagerOnsceneLoaded(Scene arg0, LoadSceneMode arg1)
+        private IEnumerator RunGameTicks()
+        {
+            do
+            {
+                // Not worrying about bot ai atm.
+                // Todo: better bot ai
+                CurrentState.RowerDatas[RowerId.Second].TargetSpeed = CurrentState.TargetSpeed;
+                StateUpdated?.Invoke();
+                yield return null;
+            } while (_rules.SimulationTick(_currentRaceConfig, CurrentState, Time.deltaTime));
+        }
+
+        private void SceneManagerOnSceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             if (arg0.name != "Race") return;
+            
             LoadRaceData();
         }
 
@@ -103,7 +160,7 @@ namespace GameLogic
 
         public void LoadRaceData()
         {
-            _currentRaceData = _gameData.GetRaceData(_currentRaceKey);
+            _currentRaceConfig = gameConfig.GetRaceConfig(_currentRaceKey);
         }
         
         

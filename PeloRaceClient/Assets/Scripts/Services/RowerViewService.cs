@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GameLogic;
 using UnityEngine;
+using Utils;
 
 namespace Services
 {
@@ -32,8 +33,17 @@ namespace Services
 
         public RowerViewService(GameRunner runner)
         {
+            _instance = this;
             _gameRunner = runner;
             _gameRunner.StateUpdated += GameStateUpdated;
+            GameStateUpdated();
+        }
+
+        ~RowerViewService()
+        {
+            if (_gameRunner != null) _gameRunner.StateUpdated -= GameStateUpdated;
+            _instance = null;
+            _gameRunner = null;
         }
 
         /// <summary>
@@ -44,8 +54,9 @@ namespace Services
         {
             foreach (var view in _rowerData)
             {
-                view.Value.CurrentPosition =
-                    view.Value.StartPosition + _gameRunner.RowerPositions[view.Key] * Vector3.forward;
+                view.Value.CurrentPosition = 
+                    GameUtils.SimToViewPosition(_gameRunner.CurrentState.RowerDatas[view.Key].SimPosition,
+                        view.Value.StartPosition, Vector3.forward);
             }
             StateUpdated?.Invoke();
         }

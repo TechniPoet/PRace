@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -7,8 +8,12 @@ namespace Data
     {
         public string DisplayName;
         public float RaceDistance;
-        public float ScoreDistanceThresh;
+        public float ScoreSpeedDistanceThresh;
         public float ScorePerSecond;
+
+        public float TargetSpeedChangeInterval;
+        public float MinTargetSpeed;
+        public float MaxTargetSpeed;
 
         public PlayerConfig ControlledPlayer;
         public PlayerConfig BotPlayer;
