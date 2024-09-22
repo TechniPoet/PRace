@@ -35,7 +35,6 @@ namespace Data
                 return;
                 // The setup below is intended for already instantiated initialization at runtime;
             }
-            Debug.Log("LoadingConfig");
             LoadConfig();
         }
 

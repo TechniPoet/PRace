@@ -3,8 +3,8 @@ namespace Views
 {
     public class CameraFollow : MonoBehaviour
     {
-        [SerializeField] private Transform object1;  // First object to follow
-        [SerializeField] private Transform object2;  // Second object to follow
+        [SerializeField] private Transform object1;
+        [SerializeField] private Transform object2;
         [SerializeField] private float minDistance = 5f; 
         [SerializeField] private float maxDistance = 20f; 
         [SerializeField] private float distanceFactor = 2f; 
