@@ -1,3 +1,5 @@
+using Data;
+using GameLogic;
 using UnityEngine;
 
 namespace Utils
@@ -14,6 +16,17 @@ namespace Utils
         public static Vector3 SimToViewPosition(float simPosition, Vector3 viewStart, Vector3 dir)
         {
             return viewStart + (simPosition * dir);
+        }
+        
+        /// <summary>
+        /// Calculates Score for specific player.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="rowerData"></param>
+        /// <returns></returns>
+        public static float CalculateScore(RaceConfig config, GameRunner.RowerData rowerData)
+        {
+            return config.ScorePerSecond * rowerData.ScoreTime;
         }
     }
 }

@@ -5,6 +5,7 @@ using Data;
 using Services;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utils;
 
 namespace GameLogic
 {
@@ -83,6 +84,7 @@ namespace GameLogic
         // I would not want GameRunner to hold the service references.
         private RowerViewService _viewService;
         private InputService _inputService;
+        private UIService _uiService;
         private IGameRules _rules;
 
         public GameState CurrentState;
@@ -109,12 +111,14 @@ namespace GameLogic
             SceneManager.sceneLoaded += SceneManagerOnSceneLoaded;
             _viewService = new RowerViewService(this);
             _inputService = new InputService(this);
+            _uiService = new UIService(this);
         }
 
         private void OnDestroy()
         {
             _viewService = null;
             _inputService = null;
+            _uiService = null;
             SceneManager.sceneLoaded -= SceneManagerOnSceneLoaded;
         }
 
@@ -143,7 +147,7 @@ namespace GameLogic
 
         private IEnumerator RunGameTicks()
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
             do
             {
                 // Not worrying about bot ai atm.
@@ -171,7 +175,15 @@ namespace GameLogic
         {
             _currentRaceConfig = gameConfig.GetRaceConfig(_currentRaceKey);
         }
-        
-        
+
+        public float GetScore(RowerId id)
+        {
+            return _currentRaceConfig == null ? 0 : GameUtils.CalculateScore(_currentRaceConfig, CurrentState.RowerDatas[id]);
+        }
+
+        public float GetTotalRaceDistance()
+        {
+            return _currentRaceConfig == null ? 0 : _currentRaceConfig.RaceDistance;
+        }
     }
 }
