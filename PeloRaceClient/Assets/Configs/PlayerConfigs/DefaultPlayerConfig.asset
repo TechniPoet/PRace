@@ -16,4 +16,4 @@ MonoBehaviour:
   MinSpeed: 1
   ChangeInterval: 0.1
   LerpToSpeedInterval: 0.5
-  StartSpeed: 2
+  StartSpeed: 1
