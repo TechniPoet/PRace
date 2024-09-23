@@ -3057,8 +3057,6 @@ MonoBehaviour:
   _cursor: {fileID: 1887953944}
   _meter: {fileID: 595814196}
   _cursorMoveSpeed: 0.0012
-  _targetPosition: 0
-  _currentPosition: 0
 --- !u!114 &659035617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3942,6 +3940,8 @@ MonoBehaviour:
   distanceFactor: 2
   smoothSpeed: 0.125
   offset: {x: 0, y: 0, z: 0}
+  _objectTensionBreak: 40
+  _tensionBrokenLeadDistance: 3
 --- !u!4 &844015428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 361278215348213143, guid: e7bd775439f920c469b0b23c990adcdc,
