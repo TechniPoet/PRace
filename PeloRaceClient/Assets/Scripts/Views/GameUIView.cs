@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using GameLogic;
 using Services;
@@ -44,6 +45,11 @@ namespace Views
             _service = UIService.Instance;
             _service.StateUpdated += StateUpdated;
             StateUpdated();
+        }
+
+        private void OnDestroy()
+        {
+            if (_service != null) _service.StateUpdated -= StateUpdated;
         }
 
         IEnumerator StateUpdateWait()

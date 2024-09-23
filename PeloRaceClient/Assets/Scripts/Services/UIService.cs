@@ -25,6 +25,7 @@ namespace Services
         #region Events
         
         public Action StateUpdated = () => { };
+        public Action GameOver = () => { };
 
         #endregion
         
@@ -33,13 +34,17 @@ namespace Services
             _instance = this;
             _gameRunner = runner;
             _gameRunner.StateUpdated += GameStateUpdated;
+            _gameRunner.GameOver += GameOver;
             GameStateUpdated();
         }
         
         ~UIService()
         {
-            
-            if (_gameRunner != null) _gameRunner.StateUpdated -= GameStateUpdated;
+            if (_gameRunner != null)
+            {
+                _gameRunner.GameOver -= GameOver;
+                _gameRunner.StateUpdated -= GameStateUpdated;
+            }
             _instance = null;
             _gameRunner = null;
         }

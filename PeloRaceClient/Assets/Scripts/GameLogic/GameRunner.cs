@@ -98,6 +98,7 @@ namespace GameLogic
         
         #region Events
         public event Action StateUpdated = () => { };
+        public event Action GameOver = () => { };
         #endregion
 
 #region Setup Teardown
@@ -141,6 +142,7 @@ namespace GameLogic
         public void EndGame()
         {
             if (_gameTickRoutine != null) StopCoroutine(_gameTickRoutine);
+            GameOver?.Invoke();
         }
 
         public void AdjustRowerSpeed(RowerId id, bool up)
@@ -159,6 +161,8 @@ namespace GameLogic
                 StateUpdated?.Invoke();
                 yield return null;
             } while (_rules.SimulationTick(_currentRaceConfig, CurrentState, Time.deltaTime));
+
+            EndGame();
         }
 
         private void BotBehavior()
