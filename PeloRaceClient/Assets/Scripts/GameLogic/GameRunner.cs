@@ -141,7 +141,8 @@ namespace GameLogic
 
         public void AdjustRowerSpeed(RowerId id, bool up)
         {
-            if (CurrentState is { RaceEnded: true }) return;
+            // don't register speed change if game is over or game is paused
+            if (CurrentState is { RaceEnded: true } || Time.time == 0) return;
             _rules.AdjustRowerTargetSpeed(_currentRaceConfig, CurrentState, id, up);
         }
 
