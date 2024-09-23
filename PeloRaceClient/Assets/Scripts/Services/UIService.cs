@@ -25,7 +25,7 @@ namespace Services
         #region Events
         
         public Action StateUpdated = () => { };
-        public Action GameOver = () => { };
+        public Action GameOverEvent = () => { };
 
         #endregion
         
@@ -47,6 +47,11 @@ namespace Services
             }
             _instance = null;
             _gameRunner = null;
+        }
+
+        private void GameOver()
+        {
+            GameOverEvent?.Invoke();
         }
         
 

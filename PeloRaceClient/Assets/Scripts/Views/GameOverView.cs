@@ -1,18 +1,15 @@
-using System;
 using System.Collections;
-using GameLogic;
 using Services;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using Views.UI;
 
 namespace Views
 {
     public class GameOverView : MonoBehaviour
     {
         private UIService _service;
-        private GameObject _GameOverScreen;
+        [SerializeField] private GameObject _gameOverScreen;
+        [SerializeField] private TextMeshProUGUI _endGameText;
         
         private IEnumerator Start()
         {
@@ -21,19 +18,21 @@ namespace Views
             {
                 yield return null;
             }
-
+            
             _service = UIService.Instance;
-            _service.GameOver += GameEnded;
+            _service.GameOverEvent += GameEnded;
         }
 
         private void OnDestroy()
         {
-            if (_service != null) _service.GameOver -= GameEnded;
+            if (_service != null) _service.GameOverEvent -= GameEnded;
         }
 
         private void GameEnded()
         {
-            _GameOverScreen.SetActive(true);
+            Debug.Log("GameOver");
+            _gameOverScreen.SetActive(true);
+            _endGameText.text = $"Congratulations!\n \nScore:{_service.PlayerScore:0.0}";
         }
     }
 }
