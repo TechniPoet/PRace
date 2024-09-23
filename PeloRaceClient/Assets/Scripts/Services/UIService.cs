@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Codice.CM.Common;
 using GameLogic;
 
 namespace Services
@@ -15,6 +16,8 @@ namespace Services
         public float PlayerSpeed;
         public float RaceDistance;
         public float PlayerPosition;
+        public bool IsScoring;
+        public bool Accelerating;
         
         private GameRunner _gameRunner;
         
@@ -50,6 +53,8 @@ namespace Services
             PlayerSpeed = _gameRunner.CurrentState.RowerDatas[GameRunner.RowerId.First].Speed;
             RaceDistance = _gameRunner.GetTotalRaceDistance();
             PlayerPosition = _gameRunner.CurrentState.RowerDatas[GameRunner.RowerId.First].SimPosition;
+            IsScoring = _gameRunner.IsScoring(GameRunner.RowerId.First);
+            Accelerating = _gameRunner.CurrentState.RowerDatas[GameRunner.RowerId.First].SpeedUp;
             StateUpdated?.Invoke();
         }
     }

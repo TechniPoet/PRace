@@ -18,6 +18,16 @@ namespace Utils
         {
             return new Vector3(vec.x, y, vec.z);
         }
+
+        public static Vector2 WithX(this Vector2 vec, float x)
+        {
+            return new Vector2(x, vec.y);
+        }
+
+        public static Vector2 WithY(this Vector2 vec, float y)
+        {
+            return new Vector2(vec.x, y);
+        }
         
         public static Vector3 AsVector3(this Vector2 vector2, bool swapYZ = false, float AddedFieldValue = 1f)
         {

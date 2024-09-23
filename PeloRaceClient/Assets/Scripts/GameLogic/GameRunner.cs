@@ -177,11 +177,13 @@ namespace GameLogic
             StartGame();
         }
 
+        /* TODO: setup race selection in main menu
         public void SetRace(string raceKey)
         {
             _currentRaceKey = raceKey;
         }
-
+        */
+        
         public void LoadRaceData()
         {
             _currentRaceConfig = gameConfig.GetRaceConfig(_currentRaceKey);
@@ -195,6 +197,11 @@ namespace GameLogic
         public float GetTotalRaceDistance()
         {
             return _currentRaceConfig == null ? 0 : _currentRaceConfig.RaceDistance;
+        }
+
+        public bool IsScoring(RowerId id)
+        {
+            return _rules != null && _rules.IsInScoreDistance(_currentRaceConfig, CurrentState, CurrentState.RowerDatas[id]);
         }
     }
 }

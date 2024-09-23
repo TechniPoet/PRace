@@ -77,7 +77,7 @@ namespace GameLogic
             {
                 rower.Value.Speed += deltaTime * rower.Value.SpeedChangePerSecond * 
                                      (rower.Value.SpeedUp ? 1 : -1);
-                Debug.Log($"{rower.Key} {rower.Value.Speed} {rower.Value.SpeedUp} {rower.Value.SpeedChangePerSecond}");
+                
                 rower.Value.Speed = Mathf.Clamp(rower.Value.Speed, rower.Value.MinSpeed, rower.Value.MaxSpeed);
             }
         }
