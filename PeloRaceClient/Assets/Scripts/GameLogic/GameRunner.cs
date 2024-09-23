@@ -130,6 +130,9 @@ namespace GameLogic
 #endregion
         
 
+        /// <summary>
+        /// Starts a new race game, initializing game state and starting the simulation loop.
+        /// </summary>
         public void StartGame()
         {
             _rules = new DefaultGameRules();
@@ -139,12 +142,20 @@ namespace GameLogic
             _gameTickRoutine = StartCoroutine(RunGameTicks());
         }
 
+        /// <summary>
+        /// Ends the current game, stopping the simulation and triggering the GameOver event.
+        /// </summary>
         public void EndGame()
         {
             if (_gameTickRoutine != null) StopCoroutine(_gameTickRoutine);
             GameOver?.Invoke();
         }
 
+        /// <summary>
+        /// Adjusts the speed of a specified rower by increasing or decreasing it based on user input.
+        /// </summary>
+        /// <param name="id">ID of the rower to adjust.</param>
+        /// <param name="up">True to increase speed, false to decrease speed.</param>
         public void AdjustRowerSpeed(RowerId id, bool up)
         {
             // don't register speed change if game is over or game is paused
@@ -152,12 +163,15 @@ namespace GameLogic
             _rules.AdjustRowerAcceleration(_currentRaceConfig, CurrentState, id, up);
         }
 
+        /// <summary>
+        /// Coroutine that manages the simulation ticks of the game, updating game state at each frame.
+        /// </summary>
         private IEnumerator RunGameTicks()
         {
             yield return new WaitForSeconds(1f);
             do
             {
-                
+                BotBehavior();
                 StateUpdated?.Invoke();
                 yield return null;
             } while (_rules.SimulationTick(_currentRaceConfig, CurrentState, Time.deltaTime));
@@ -165,6 +179,9 @@ namespace GameLogic
             EndGame();
         }
 
+        /// <summary>
+        /// Simulates bot behavior, adjusting its speed to match the target speed with some randomness.
+        /// </summary>
         private void BotBehavior()
         {
             // some randomness for the fun of it
@@ -188,6 +205,9 @@ namespace GameLogic
         }
         */
         
+        /// <summary>
+        /// Handles scene load events, starting the game when the race scene is loaded.
+        /// </summary>
         public void LoadRaceData()
         {
             _currentRaceConfig = gameConfig.GetRaceConfig(_currentRaceKey);

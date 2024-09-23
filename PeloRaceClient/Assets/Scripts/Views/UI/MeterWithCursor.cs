@@ -1,19 +1,19 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using Utils;
 
 namespace Views.UI
 {
+    /// <summary>
+    /// Tool for adjusting a curser that is the child of a rectTransform and can adjust itself along the x axis relative to it's parent
+    /// </summary>
     public class MeterWithCursor : MonoBehaviour
     {
         [SerializeField] private RectTransform _cursor;
         [SerializeField] private RectTransform _meter;
         [SerializeField,Range(0,.02f)] private float _cursorMoveSpeed;
         private float _cursorHalfWidth;
-        [Header("Debug")]
-        [SerializeField, ReadOnly] private float _targetPosition;
-        [SerializeField, ReadOnly] private float _currentPosition;
+        private float _targetPosition;
+        private float _currentPosition;
 
         private Coroutine _lerpRoutine;
         private void Awake()
