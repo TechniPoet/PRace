@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 296ecd3072dc4707a168377a2f2121fa, type: 3}
   m_Name: BotPlayerConfig
   m_EditorClassIdentifier: 
-  MaxSpeed: 15
+  MaxSpeed: 12
   MinSpeed: 1
   SpeedChangePerSecond: 0.5
   StartSpeed: 1

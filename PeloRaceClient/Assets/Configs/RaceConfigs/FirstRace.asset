@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FirstRace
   m_EditorClassIdentifier: 
   DisplayName: First Race
-  RaceDistance: 100
+  RaceDistance: 400
   ScoreSpeedDistanceThresh: 1.5
   ScorePerSecond: 10
   TargetSpeedChangeInterval: 5
