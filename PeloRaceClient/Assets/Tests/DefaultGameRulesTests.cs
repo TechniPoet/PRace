@@ -58,22 +58,24 @@ namespace Tests
             _config.ScoreSpeedDistanceThresh = ScoreSpeedDistanceThreshold;
             _config.RaceDistance = RaceDistance;
             _config.ControlledPlayer = ScriptableObject.CreateInstance<PlayerConfig>();
-            _config.ControlledPlayer.ChangeInterval = SpeedChangeIntervalPlayer1;
             _config.ControlledPlayer.MinSpeed = MinSpeedPlayer1;
             _config.ControlledPlayer.MaxSpeed = MaxSpeedPlayer1;
             _config.ControlledPlayer.StartSpeed = Player1StartSpeed;
-            _config.ControlledPlayer.LerpToSpeedInterval = Player1LerpToSpeedInterval;
+            _config.ControlledPlayer.SpeedChangePerSecond = Player1LerpToSpeedInterval;
             _config.BotPlayer = ScriptableObject.CreateInstance<PlayerConfig>();
-            _config.BotPlayer.ChangeInterval = SpeedChangeIntervalPlayer2;
             _config.BotPlayer.MinSpeed = MinSpeedPlayer2;
             _config.BotPlayer.MaxSpeed = MaxSpeedPlayer2;
             _config.BotPlayer.StartSpeed = Player2StartSpeed;
-            _config.BotPlayer.LerpToSpeedInterval = Player2LerpToSpeedInterval;
+            _config.BotPlayer.SpeedChangePerSecond = Player2LerpToSpeedInterval;
+
+            // Setup player rower data using the Setup method
+            _player1 = new GameRunner.RowerData();
+            _player1.Setup(_config.ControlledPlayer);
+
+            _player2 = new GameRunner.RowerData();
+            _player2.Setup(_config.BotPlayer);
 
             _state = new GameRunner.GameState();
-            _player1 = new GameRunner.RowerData { Speed = Player1StartSpeed, LerpToSpeedInterval = Player1LerpToSpeedInterval };
-            _player2 = new GameRunner.RowerData { Speed = Player2StartSpeed, LerpToSpeedInterval = Player2LerpToSpeedInterval };
-
             _state.RowerDatas = new Dictionary<GameRunner.RowerId, GameRunner.RowerData>
             {
                 { GameRunner.RowerId.First, _player1 },
@@ -126,7 +128,7 @@ namespace Tests
         }
 
         [Test]
-        public void IsInScoreDistance_NullPlayerData_ThrowsNullReferenceException()
+        public void IsInScoreDistance_NullPlayerData_Throws()
         {
             Assert.Throws<NullReferenceException>(() => _gameRules.IsInScoreDistance(_config, _state, null));
         }
@@ -178,70 +180,9 @@ namespace Tests
         }
 
         [Test]
-        public void IsEndConditionMet_NullState_ThrowsNullReferenceException()
+        public void IsEndConditionMet_NullState_Throws()
         {
             Assert.Throws<NullReferenceException>(() => _gameRules.IsEndConditionMet(_config, null));
-        }
-
-        #endregion
-
-        #region AdjustRowerTargetSpeed
-
-        [Test]
-        public void AdjustRowerTargetSpeed_IncreasesSpeedCorrectly()
-        {
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = Player1StartSpeed;
-            _gameRules.AdjustRowerTargetSpeed(_config, _state, GameRunner.RowerId.First, true);
-
-            Assert.AreEqual(Player1StartSpeed + SpeedChangeIntervalPlayer1, _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed);
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_DecreasesSpeedCorrectly()
-        {
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = Player1StartSpeed;
-            _gameRules.AdjustRowerTargetSpeed(_config, _state, GameRunner.RowerId.First, false);
-
-            Assert.AreEqual(Player1StartSpeed - SpeedChangeIntervalPlayer1, _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed);
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_ShouldNotExceedMaxSpeed()
-        {
-            const float targetSpeedNearMax = 19.9f;
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = targetSpeedNearMax;
-            _gameRules.AdjustRowerTargetSpeed(_config, _state, GameRunner.RowerId.First, true);
-
-            Assert.AreEqual(MaxSpeedPlayer1, _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed);
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_ShouldNotFallBelowMinSpeed()
-        {
-            const float targetSpeedNearMin = 0.1f;
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = targetSpeedNearMin;
-            _gameRules.AdjustRowerTargetSpeed(_config, _state, GameRunner.RowerId.First, false);
-
-            Assert.AreEqual(MinSpeedPlayer1, _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed);
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_NullConfig_ThrowsNullReferenceException()
-        {
-            Assert.Throws<NullReferenceException>(() => _gameRules.AdjustRowerTargetSpeed(null, _state, GameRunner.RowerId.First, true));
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_NullState_ThrowsNullReferenceException()
-        {
-            Assert.Throws<NullReferenceException>(() => _gameRules.AdjustRowerTargetSpeed(_config, null, GameRunner.RowerId.First, true));
-        }
-
-        [Test]
-        public void AdjustRowerTargetSpeed_InvalidRowerId_ThrowsKeyNotFoundException()
-        {
-            var invalidRowerId = (GameRunner.RowerId)999;
-            Assert.Throws<KeyNotFoundException>(() => _gameRules.AdjustRowerTargetSpeed(_config, _state, invalidRowerId, true));
         }
 
         #endregion
@@ -273,6 +214,17 @@ namespace Tests
         }
 
         [Test]
+        public void AdjustScores_PlayerHasFinishedRace_DoesNotIncreaseScoreTime()
+        {
+            _state.RowerDatas[GameRunner.RowerId.First].SimPosition = PlayerSimPositionBeyondRace;
+            float initialScoreTime = _state.RowerDatas[GameRunner.RowerId.First].ScoreTime;
+
+            _gameRules.AdjustScores(_config, _state, DeltaTime);
+
+            Assert.AreEqual(initialScoreTime, _state.RowerDatas[GameRunner.RowerId.First].ScoreTime);
+        }
+
+        [Test]
         public void AdjustScores_NullState_ThrowsNullReferenceException()
         {
             Assert.Throws<NullReferenceException>(() => _gameRules.AdjustScores(_config, null, DeltaTime));
@@ -289,44 +241,31 @@ namespace Tests
         #region AdjustRowerSpeeds
 
         [Test]
-        public void AdjustRowerSpeeds_PlayerSpeedIncreasesTowardsTarget()
+        public void AdjustRowerSpeeds_PlayerSpeedIncreasesWithAcceleration()
         {
-            const float targetSpeedAboveCurrent = 10f;
-            _state.RowerDatas[GameRunner.RowerId.First].Speed = Player1StartSpeed;
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = targetSpeedAboveCurrent;
+            _state.RowerDatas[GameRunner.RowerId.First].SpeedUp = true;
+            float initialSpeed = _state.RowerDatas[GameRunner.RowerId.First].Speed;
 
-            _gameRules.AdjustRowerSpeeds(_state);
-
-            Assert.Greater(_state.RowerDatas[GameRunner.RowerId.First].Speed, Player1StartSpeed);
+            _gameRules.AdjustRowerSpeeds(_state, DeltaTime);
+            Debug.Log($"Final {_state.RowerDatas[GameRunner.RowerId.First].Speed}");
+            Assert.Greater(_state.RowerDatas[GameRunner.RowerId.First].Speed, initialSpeed);
         }
 
         [Test]
-        public void AdjustRowerSpeeds_PlayerSpeedDecreasesTowardsTarget()
+        public void AdjustRowerSpeeds_PlayerSpeedDecreasesWithoutAcceleration()
         {
-            const float targetSpeedBelowCurrent = 3f;
-            _state.RowerDatas[GameRunner.RowerId.First].Speed = Player1StartSpeed;
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = targetSpeedBelowCurrent;
+            _state.RowerDatas[GameRunner.RowerId.First].SpeedUp = false;
+            float initialSpeed = _state.RowerDatas[GameRunner.RowerId.First].Speed;
 
-            _gameRules.AdjustRowerSpeeds(_state);
+            _gameRules.AdjustRowerSpeeds(_state, DeltaTime);
 
-            Assert.Less(_state.RowerDatas[GameRunner.RowerId.First].Speed, Player1StartSpeed);
-        }
-
-        [Test]
-        public void AdjustRowerSpeeds_PlayerSpeedDoesNotChangeIfAtTarget()
-        {
-            _state.RowerDatas[GameRunner.RowerId.First].Speed = Player1StartSpeed;
-            _state.RowerDatas[GameRunner.RowerId.First].TargetSpeed = Player1StartSpeed;
-
-            _gameRules.AdjustRowerSpeeds(_state);
-
-            Assert.AreEqual(Player1StartSpeed, _state.RowerDatas[GameRunner.RowerId.First].Speed);
+            Assert.Less(_state.RowerDatas[GameRunner.RowerId.First].Speed, initialSpeed);
         }
 
         [Test]
         public void AdjustRowerSpeeds_NullState_ThrowsNullReferenceException()
         {
-            Assert.Throws<NullReferenceException>(() => _gameRules.AdjustRowerSpeeds(null));
+            Assert.Throws<NullReferenceException>(() => _gameRules.AdjustRowerSpeeds(null, DeltaTime));
         }
 
         #endregion
@@ -368,7 +307,6 @@ namespace Tests
         [Test]
         public void SetNewTargetSpeed_ChangesTargetSpeedAfterInterval()
         {
-            // Arrange
             _config.TargetSpeedChangeInterval = TargetSpeedChangeInterval;
             _config.MinTargetSpeed = 5f;  // Set a minimum target speed value
             _config.MaxTargetSpeed = 15f; // Set a maximum target speed value
@@ -376,10 +314,8 @@ namespace Tests
             _state.RaceTimeElapsed = 2.0f; // Set elapsed time to ensure it is greater than interval
             _state.LastTargetSpeedChange = 0.5f; // Last change happened before the interval
 
-            // Act
             _gameRules.SetNewTargetSpeed(_config, _state);
 
-            // Assert
             // Verify target speed has been changed and is not equal to default 0.0f
             Assert.AreNotEqual(0f, _state.TargetSpeed, "Expected target speed to be changed but it was not.");
         }

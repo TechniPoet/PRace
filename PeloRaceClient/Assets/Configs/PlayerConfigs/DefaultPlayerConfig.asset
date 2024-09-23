@@ -14,6 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 15
   MinSpeed: 1
-  ChangeInterval: 0.1
-  LerpToSpeedInterval: 0.5
+  SpeedChangePerSecond: 0.5
   StartSpeed: 1

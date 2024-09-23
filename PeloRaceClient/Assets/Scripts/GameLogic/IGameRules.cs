@@ -20,10 +20,10 @@ namespace GameLogic
 
         public bool SimulationTick(RaceConfig config, GameRunner.GameState state, float deltaTime);
 
-        public void AdjustRowerTargetSpeed(RaceConfig config, GameRunner.GameState state, GameRunner.RowerId id, bool up);
+        public void AdjustRowerAcceleration(RaceConfig config, GameRunner.GameState state, GameRunner.RowerId id, bool up);
         public void SetNewTargetSpeed(RaceConfig config, GameRunner.GameState state);
 
-        public void AdjustRowerSpeeds(GameRunner.GameState state);
+        public void AdjustRowerSpeeds(GameRunner.GameState state, float deltaTime);
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -7,8 +8,7 @@ namespace Data
     {
         public float MaxSpeed;
         public float MinSpeed;
-        public float ChangeInterval;
-        public float LerpToSpeedInterval;
+        public float SpeedChangePerSecond;
         public float StartSpeed;
     }
 }

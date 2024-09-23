@@ -6,6 +6,7 @@ using Services;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace GameLogic
 {
@@ -50,15 +51,18 @@ namespace GameLogic
         {
             public float SimPosition;
             public float Speed;
-            public float TargetSpeed;
-            public float LerpToSpeedInterval;
+            public bool SpeedUp = true;
+            public float SpeedChangePerSecond;
             public float ScoreTime;
+            public float MinSpeed;
+            public float MaxSpeed;
 
             public void Setup(PlayerConfig config)
             {
                 Speed = config.StartSpeed;
-                TargetSpeed = Speed;
-                LerpToSpeedInterval = config.LerpToSpeedInterval;
+                SpeedChangePerSecond = config.SpeedChangePerSecond;
+                MinSpeed = config.MinSpeed;
+                MaxSpeed = config.MaxSpeed;
             }
         }
 
@@ -142,8 +146,8 @@ namespace GameLogic
         public void AdjustRowerSpeed(RowerId id, bool up)
         {
             // don't register speed change if game is over or game is paused
-            if (CurrentState is { RaceEnded: true } || Time.time == 0) return;
-            _rules.AdjustRowerTargetSpeed(_currentRaceConfig, CurrentState, id, up);
+            if (CurrentState is { RaceEnded: true } || Time.timeScale == 0) return;
+            _rules.AdjustRowerAcceleration(_currentRaceConfig, CurrentState, id, up);
         }
 
         private IEnumerator RunGameTicks()
@@ -151,12 +155,18 @@ namespace GameLogic
             yield return new WaitForSeconds(1f);
             do
             {
-                // Not worrying about bot ai atm.
-                // Todo: better bot ai
-                CurrentState.RowerDatas[RowerId.Second].TargetSpeed = CurrentState.TargetSpeed;
+                
                 StateUpdated?.Invoke();
                 yield return null;
             } while (_rules.SimulationTick(_currentRaceConfig, CurrentState, Time.deltaTime));
+        }
+
+        private void BotBehavior()
+        {
+            // some randomness for the fun of it
+            if (Random.Range(0,1) < 0.2f) return;
+            var bot = CurrentState.RowerDatas[RowerId.Second];
+            bot.SpeedUp = bot.Speed < CurrentState.TargetSpeed;
         }
 
         private void SceneManagerOnSceneLoaded(Scene arg0, LoadSceneMode arg1)

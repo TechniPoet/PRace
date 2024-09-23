@@ -33,15 +33,6 @@ namespace GameLogic
             return state.RaceEnded;
         }
 
-        public void AdjustRowerTargetSpeed(RaceConfig config, GameRunner.GameState state, GameRunner.RowerId id, bool up)
-        {
-            var player = id == GameRunner.RowerId.First
-                ? config.ControlledPlayer
-                : config.BotPlayer;
-            state.RowerDatas[id].TargetSpeed += player.ChangeInterval *  (up ? 1 : -1);
-            state.RowerDatas[id].TargetSpeed = Mathf.Clamp(state.RowerDatas[id].TargetSpeed, player.MinSpeed, player.MaxSpeed);
-        }
-
 
         /// <summary>
         /// Runs all logic for game simulation
@@ -52,11 +43,16 @@ namespace GameLogic
             state.RaceTimeElapsed += deltaTime;
 
             SetNewTargetSpeed(config, state);
-            AdjustRowerSpeeds(state);
+            AdjustRowerSpeeds(state, deltaTime);
             AdjustRowerPositions(state, deltaTime);
             AdjustScores(config, state, deltaTime);
             
             return !IsEndConditionMet(config, state);
+        }
+
+        public void AdjustRowerAcceleration(RaceConfig config, GameRunner.GameState state, GameRunner.RowerId id, bool up)
+        {
+            state.RowerDatas[id].SpeedUp = up;
         }
 
         public bool FinishedRace(RaceConfig config, GameRunner.RowerData rower)
@@ -75,13 +71,14 @@ namespace GameLogic
             }
         }
 
-        public void AdjustRowerSpeeds(GameRunner.GameState state)
+        public void AdjustRowerSpeeds(GameRunner.GameState state, float deltaTime)
         {
             foreach (var rower in state.RowerDatas)
             {
-                if (Mathf.Approximately(rower.Value.Speed, rower.Value.TargetSpeed)) continue;
-                rower.Value.Speed += rower.Value.LerpToSpeedInterval * 
-                                    (rower.Value.Speed > rower.Value.TargetSpeed ? -1 : 1);
+                rower.Value.Speed += deltaTime * rower.Value.SpeedChangePerSecond * 
+                                     (rower.Value.SpeedUp ? 1 : -1);
+                Debug.Log($"{rower.Key} {rower.Value.Speed} {rower.Value.SpeedUp} {rower.Value.SpeedChangePerSecond}");
+                rower.Value.Speed = Mathf.Clamp(rower.Value.Speed, rower.Value.MinSpeed, rower.Value.MaxSpeed);
             }
         }
         
@@ -95,7 +92,8 @@ namespace GameLogic
 
         public void SetNewTargetSpeed(RaceConfig config, GameRunner.GameState state)
         {
-            if (state.RaceTimeElapsed - state.LastTargetSpeedChange >= config.TargetSpeedChangeInterval)
+            // Change target speed on first pass or after every time interval
+            if (state.RaceTimeElapsed - state.LastTargetSpeedChange >= config.TargetSpeedChangeInterval || state.LastTargetSpeedChange == 0)
             {
                 state.TargetSpeed = Random.Range(config.MinTargetSpeed, config.MaxTargetSpeed);
                 state.LastTargetSpeedChange = state.RaceTimeElapsed;

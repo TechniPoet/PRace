@@ -16,8 +16,8 @@ MonoBehaviour:
   RaceDistance: 100
   ScoreSpeedDistanceThresh: 2
   ScorePerSecond: 10
-  TargetSpeedChangeInterval: 3
-  MinTargetSpeed: 1
+  TargetSpeedChangeInterval: 5
+  MinTargetSpeed: 2
   MaxTargetSpeed: 10
   ControlledPlayer: {fileID: 11400000, guid: bbd1cd15cb5cc84449a8ae556800c95b, type: 2}
   BotPlayer: {fileID: 11400000, guid: 0b48ed4f9638616468a89322954128bd, type: 2}
